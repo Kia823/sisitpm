@@ -1,0 +1,365 @@
+<?php
+
+use App\Http\Controllers\AprobacionVerificacionController;
+use App\Http\Controllers\Web\ActaBajaController;
+use App\Http\Controllers\Web\ActaRecepcionController;
+use App\Http\Controllers\Web\ActaTransferenciaController;
+use App\Http\Controllers\Web\ActivoController;
+use App\Http\Controllers\Web\AmbienteController;
+use App\Http\Controllers\Web\AprobacionController;
+use App\Http\Controllers\Web\CarreraController;
+use App\Http\Controllers\Web\CategoriaController;
+use App\Http\Controllers\Web\ConfiguracionController;
+use App\Http\Controllers\Web\DashboardController;
+use App\Http\Controllers\Web\ItemController;
+use App\Http\Controllers\Web\LiberacionController;
+use App\Http\Controllers\Web\ReporteController;
+use App\Http\Controllers\Web\SincronizacionController;
+use App\Http\Controllers\Web\UsuarioController;
+use App\Http\Controllers\Web\VerificacionController;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
+
+require __DIR__.'/auth.php';
+
+// ============================================================
+// RUTA RAÍZ
+// ============================================================
+Route::get('/', function () {
+    return Auth::check()
+        ? redirect()->route('dashboard')
+        : redirect()->route('login');
+});
+
+// ============================================================
+// SIN CONEXIÓN — la abre el service worker cuando no hay red
+// ============================================================
+Route::get('/offline', function () {
+    return Auth::check()
+        ? view('offline')
+        : redirect()->route('login');
+})->name('offline');
+
+// ============================================================
+// RUTAS DE AUTENTICACIÓN (públicas)
+// ============================================================
+
+// Login tradicional (CI + contraseña)
+Route::get('/login',  [\App\Http\Controllers\Auth\LoginController::class, 'showLoginForm'])
+    ->name('login')
+    ->middleware('guest');
+
+Route::post('/login', [\App\Http\Controllers\Auth\LoginController::class, 'login'])
+    ->middleware('guest');
+
+// Login por QR
+Route::get('/login/qr',  [\App\Http\Controllers\Auth\LoginController::class, 'showQrLogin'])
+    ->name('login.qr')
+    ->middleware('guest');
+
+Route::post('/login/qr', [\App\Http\Controllers\Auth\LoginController::class, 'loginQr'])
+    ->name('login.qr.post')
+    ->middleware('guest');
+
+// Logout
+Route::post('/logout', [\App\Http\Controllers\Auth\LoginController::class, 'logout'])
+    ->name('logout')
+    ->middleware('auth');
+
+// ⭐ NUEVA: Limpiar flag de bienvenida (AJAX)
+Route::post('/login/clear-welcome', [\App\Http\Controllers\Auth\LoginController::class, 'clearWelcome'])
+    ->name('login.clear-welcome')
+    ->middleware('auth');
+
+// ============================================================
+// RUTAS PROTEGIDAS
+// ============================================================
+// `usuario.activo` cierra la sesión de quien la administración desactivó.
+Route::middleware(['auth', 'usuario.activo'])->group(function () {
+
+    // ---------- Dashboard ----------
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    // ---------- Perfil ----------
+    Route::prefix('profile')->name('profile.')->group(function () {
+        Route::get('/',    [\App\Http\Controllers\ProfileController::class, 'edit'])->name('edit');
+        Route::patch('/',  [\App\Http\Controllers\ProfileController::class, 'update'])->name('update');
+        Route::delete('/', [\App\Http\Controllers\ProfileController::class, 'destroy'])->name('destroy');
+    });
+
+    // ==========================================================
+    // USUARIOS — Solo ADMIN
+    // ==========================================================
+    Route::prefix('usuarios')->name('usuarios.')->middleware('rol:ADMINISTRADOR')->group(function () {
+        Route::get('/',           [UsuarioController::class, 'index'])->name('index');
+        Route::get('/buscar',     [UsuarioController::class, 'buscar'])->name('buscar');
+        Route::post('/',          [UsuarioController::class, 'store'])->name('store');
+        Route::put('/{id}',       [UsuarioController::class, 'update'])->name('update');
+        Route::patch('/{id}/toggle-verificar', [UsuarioController::class, 'toggleVerificar'])->name('toggle_verificar');
+        Route::get('/create',    [UsuarioController::class, 'create'])->name('create');
+        Route::get('/{id}/edit', [UsuarioController::class, 'edit'])->name('edit');
+        Route::delete('/{id}',    [UsuarioController::class, 'destroy'])->name('destroy');
+        Route::get('/{id}/qr',    [UsuarioController::class, 'generarQr'])->name('qr');
+        Route::post('/{id}/enviar-credenciales', [UsuarioController::class, 'enviarCredenciales'])->name('enviar_credenciales');
+    });
+
+    // ==========================================================
+    // ITEMS — Todos ven; Solo ADMIN modifica
+    // ==========================================================
+    Route::prefix('items')->name('items.')->group(function () {
+        Route::get('/',               [ItemController::class, 'index'])->name('index');
+        Route::get('/buscar',          [ItemController::class, 'buscar'])->name('buscar');
+        Route::get('/crear',           [ItemController::class, 'create'])->name('create');
+        Route::get('/{numeroItem}',    [ItemController::class, 'show'])->name('show');
+
+        Route::middleware('rol:ADMINISTRADOR')->group(function () {
+            Route::post('/',                          [ItemController::class, 'store'])->name('store');
+            Route::get('/{id}/editar',                [ItemController::class, 'edit'])->name('edit');
+            Route::put('/{id}',                       [ItemController::class, 'update'])->name('update');
+            Route::delete('/{id}',                    [ItemController::class, 'destroy'])->name('destroy');
+            Route::post('/{id}/custodios',            [ItemController::class, 'asignarCustodio'])->name('custodios.store');
+            Route::delete('/{id}/custodios/{idUsuario}', [ItemController::class, 'desvincularCustodio'])->name('custodios.destroy');
+        });
+    });
+
+    // ==========================================================
+    // CARRERAS — Todos ven; Solo ADMIN modifica
+    // ==========================================================
+    Route::prefix('carreras')->group(function () {
+        Route::get('/',             [CarreraController::class, 'index'])->name('carreras.index');
+        Route::get('/{id_carrera}', [CarreraController::class, 'show'])->name('carreras.show');
+
+        Route::middleware('rol:ADMINISTRADOR')->group(function () {
+            Route::post('/',               [CarreraController::class, 'store'])->name('carreras.store');
+            Route::put('/{id_carrera}',    [CarreraController::class, 'update'])->name('carreras.update');
+            Route::delete('/{id_carrera}', [CarreraController::class, 'destroy'])->name('carreras.destroy');
+        });
+
+        // Ambientes anidados bajo carrera
+        Route::prefix('{id_carrera}/ambientes')->name('ambientes.')->group(function () {
+            Route::get('/',      [AmbienteController::class, 'index'])->name('index');
+            Route::get('/crear', [AmbienteController::class, 'create'])->name('create');
+
+            Route::middleware('rol:ADMINISTRADOR')->group(function () {
+                Route::post('/',                [AmbienteController::class, 'store'])->name('store');
+                Route::put('/{id_ambiente}',    [AmbienteController::class, 'update'])->name('update');
+                Route::delete('/{id_ambiente}', [AmbienteController::class, 'destroy'])->name('destroy');
+            });
+        });
+    });
+
+    // ==========================================================
+    // AMBIENTES SUELTOS (detalle por ID)
+    // ==========================================================
+    Route::prefix('ambientes')->name('ambientes.')->group(function () {
+        Route::get('/{id}', [AmbienteController::class, 'show'])->name('detalle');
+    });
+
+    // ==========================================================
+    // CATEGORÍAS — Todos ven; Solo ADMIN modifica
+    // ==========================================================
+    Route::prefix('categorias')->name('categorias.')->group(function () {
+        Route::get('/', [CategoriaController::class, 'index'])->name('index');
+
+        Route::middleware('rol:ADMINISTRADOR')->group(function () {
+            Route::post('/',       [CategoriaController::class, 'store'])->name('store');
+            Route::put('/{id}',    [CategoriaController::class, 'update'])->name('update');
+            Route::delete('/{id}', [CategoriaController::class, 'destroy'])->name('destroy');
+        });
+
+        Route::get('/{id}', [ActivoController::class, 'show'])->name('show');
+    });
+
+    // ==========================================================
+    // ACTIVOS — Todos ven; Solo ADMIN modifica
+    // ==========================================================
+    Route::prefix('activos')->name('activos.')->group(function () {
+
+        // Rutas específicas PRIMERO
+        Route::get('/create',           [ActivoController::class, 'create'])->name('create')->middleware('rol:ADMINISTRADOR');
+        Route::get('/exportar/pdf',     [ActivoController::class, 'pdf'])->name('pdf');
+        Route::get('/exportar/excel',   [ActivoController::class, 'excel'])->name('excel');
+        Route::get('/codigo/{codigo?}', [ActivoController::class, 'buscarPorCodigo'])->name('buscarPorCodigo');
+
+        Route::get('/grupo/{id_categoria}/{nombre}', [ActivoController::class, 'verGrupo'])->name('grupo');
+
+        // CRUD principal
+        Route::get('/',          [ActivoController::class, 'index'])->name('index');
+        Route::post('/',         [ActivoController::class, 'store'])->name('store')->middleware('rol:ADMINISTRADOR');
+        Route::get('/{id}/edit', [ActivoController::class, 'edit'])->name('edit')->middleware('rol:ADMINISTRADOR');
+        Route::put('/{id}',      [ActivoController::class, 'update'])->name('update')->middleware('rol:ADMINISTRADOR');
+        Route::delete('/{id}',   [ActivoController::class, 'destroy'])->name('destroy')->middleware('rol:ADMINISTRADOR');
+
+        // Extras
+        Route::get('/{id}/tarjeta',     [ActivoController::class, 'tarjeta'])->name('tarjeta');
+        Route::get('/{id}/tarjeta/pdf', [ActivoController::class, 'tarjetaPdf'])->name('tarjeta.pdf');
+        Route::get('/{id}/qr',          [ActivoController::class, 'descargarQr'])->name('descargar_qr');
+        Route::get('/{id}/etiqueta',    [ActivoController::class, 'etiqueta'])->name('etiqueta');
+    });
+
+    // ==========================================================
+    // REPORTES — Todos ven
+    // ==========================================================
+    Route::prefix('reportes')->name('reportes.')->group(function () {
+
+        Route::get('/', [ReporteController::class, 'index'])->name('index');
+
+        // 1. Inventario General
+        Route::get('/inventario-general',       [ReporteController::class, 'inventarioGeneral'])->name('inventario.general');
+        Route::get('/inventario-general/pdf',   [ReporteController::class, 'inventarioGeneralPdf'])->name('inventario.general.pdf');
+        Route::get('/inventario-general/excel', [ReporteController::class, 'inventarioGeneralExcel'])->name('inventario.general.excel');
+
+        // 2. Por Ambiente
+        Route::get('/por-ambiente/{id_ambiente}',       [ReporteController::class, 'porAmbiente'])->name('por.ambiente');
+        Route::get('/por-ambiente/{id_ambiente}/pdf',   [ReporteController::class, 'porAmbientePdf'])->name('por.ambiente.pdf');
+        Route::get('/por-ambiente/{id_ambiente}/excel', [ReporteController::class, 'porAmbienteExcel'])->name('por.ambiente.excel');
+
+        // 3. Por Aula
+        Route::get('/aula/{id_ambiente}',       [ReporteController::class, 'porAula'])->name('aula');
+        Route::get('/aula/{id_ambiente}/pdf',   [ReporteController::class, 'porAulaPdf'])->name('aula.pdf');
+        Route::get('/aula/{id_ambiente}/excel', [ReporteController::class, 'porAulaExcel'])->name('aula.excel');
+
+        // 4. Por Carrera
+        Route::get('/carrera/{id_carrera}',     [ReporteController::class, 'porCarrera'])->name('por.carrera');
+        Route::get('/carrera/{id_carrera}/pdf', [ReporteController::class, 'porCarreraPdf'])->name('por.carrera.pdf');
+
+        // 5. Por Categoría
+        Route::get('/categoria/{idCategoria}',     [ReporteController::class, 'porCategoria'])->name('categoria');
+        Route::get('/categoria/{idCategoria}/pdf', [ReporteController::class, 'porCategoriaPdf'])->name('categoria.pdf');
+
+        // Exportaciones genéricas
+        Route::get('/pdf',   [ReporteController::class, 'pdf'])->name('pdf');
+        Route::get('/excel', [ReporteController::class, 'excel'])->name('excel');
+    });
+
+    // ==========================================================
+    // VERIFICACIONES
+    // ==========================================================
+    Route::prefix('verificaciones')->name('verificaciones.')
+        ->middleware('puede.verificar')
+        ->group(function () {
+            Route::get('/',               [VerificacionController::class, 'index'])->name('index');
+            Route::post('/guardar-item',  [VerificacionController::class, 'guardarItem'])->name('guardarItem');
+            Route::post('/finalizar',     [VerificacionController::class, 'finalizar'])->name('finalizar');
+            Route::get('/exportar/pdf',   [VerificacionController::class, 'exportarPdf'])->name('pdf');
+            Route::get('/exportar/excel', [VerificacionController::class, 'exportarExcel'])->name('excel');
+
+            Route::get('/categorias-por-ambiente', [VerificacionController::class, 'categoriasPorAmbiente'])
+                ->name('categoriasPorAmbiente');
+        });
+
+    // ==========================================================
+    // SINCRONIZACIÓN OFFLINE — el inventario descarga catálogo y
+    // envía lo que registró sin señal.
+    // ==========================================================
+    Route::prefix('sincronizacion')->name('sincronizacion.')->group(function () {
+        Route::get('/catalogo',        [SincronizacionController::class, 'catalogo'])->name('catalogo');
+        Route::post('/verificaciones', [SincronizacionController::class, 'verificaciones'])->name('verificaciones');
+    });
+
+    // ==========================================================
+    // APROBACIONES — Solo ADMIN. Bandeja única.
+    // ==========================================================
+    Route::get('/aprobaciones', [AprobacionController::class, 'index'])
+        ->name('aprobaciones.index')
+        ->middleware('rol:ADMINISTRADOR');
+
+    // ==========================================================
+    // APROBACIÓN DE VERIFICACIONES — SOLO ADMIN
+    // ==========================================================
+    Route::prefix('verificaciones-aprobacion')->name('verificaciones-aprobacion.')
+        ->middleware('rol:ADMINISTRADOR')
+        ->group(function () {
+            Route::get('/',               [AprobacionVerificacionController::class, 'index'])->name('index');
+            Route::post('/{id}/aprobar',  [AprobacionVerificacionController::class, 'aprobar'])->name('aprobar');
+            Route::post('/{id}/rechazar', [AprobacionVerificacionController::class, 'rechazar'])->name('rechazar');
+            Route::post('/{id}/corregir', [AprobacionVerificacionController::class, 'corregir'])->name('corregir');
+            Route::post('/ambiente/{ambienteId}/aprobar-correctas', [AprobacionVerificacionController::class, 'aprobarCorrectasDeAmbiente'])->name('aprobar-ambiente');
+        });
+
+    // ==========================================================
+    // ACTAS
+    // ==========================================================
+    Route::prefix('actas')->name('actas.')->group(function () {
+
+        // ---------- ACTA DE BAJA ----------
+        Route::prefix('baja')->name('baja.')->group(function () {
+            Route::get('/',            [ActaBajaController::class, 'index'])->name('index');
+            Route::get('/crear',       [ActaBajaController::class, 'create'])->name('create');
+            Route::post('/',           [ActaBajaController::class, 'store'])->name('store');
+            Route::get('/{acta}',      [ActaBajaController::class, 'show'])->name('show');
+            Route::get('/{acta}/pdf',  [ActaBajaController::class, 'pdf'])->name('pdf');
+
+            Route::middleware('rol:ADMINISTRADOR')->group(function () {
+                Route::post('/{acta}/aprobar',  [ActaBajaController::class, 'aprobar'])->name('aprobar');
+                Route::post('/{acta}/rechazar', [ActaBajaController::class, 'rechazar'])->name('rechazar');
+            });
+        });
+
+        // ---------- ACTA DE TRANSFERENCIA ----------
+        // El inventariador solicita; la bien espera en el ambiente de
+        // origen hasta que la administración la aprueba.
+        Route::prefix('transferencia')->name('transferencia.')->group(function () {
+            Route::get('/',            [ActaTransferenciaController::class, 'index'])->name('index');
+            Route::get('/crear',       [ActaTransferenciaController::class, 'create'])->name('create');
+            Route::post('/',           [ActaTransferenciaController::class, 'store'])->name('store');
+            Route::get('/{acta}',      [ActaTransferenciaController::class, 'show'])->name('show');
+            Route::get('/{acta}/pdf',  [ActaTransferenciaController::class, 'pdf'])->name('pdf');
+
+            Route::middleware('rol:ADMINISTRADOR')->group(function () {
+                Route::post('/{acta}/aprobar',  [ActaTransferenciaController::class, 'aprobar'])->name('aprobar');
+                Route::post('/{acta}/rechazar', [ActaTransferenciaController::class, 'rechazar'])->name('rechazar');
+            });
+        });
+
+        // ---------- ACTA DE ENTREGA Y RECEPCIÓN ----------
+        Route::prefix('recepcion')->name('recepcion.')->group(function () {
+            Route::get('/',          [ActaRecepcionController::class, 'index'])->name('index');
+            Route::get('/pdf/{id}',  [ActaRecepcionController::class, 'pdf'])->name('pdf');
+        });
+
+        // ---------- ACTA DE ALTA ----------
+        Route::get('/alta/{activo_id}/pdf', [ActaRecepcionController::class, 'actaAltaPdf'])->name('alta.pdf');
+
+        // ---------- ACTA DE LIBERACIÓN ----------
+        // Los custodios del ambiente firman el acta y la entregan al
+        // jefe de carrera. No cambia la custodia en el sistema.
+        Route::prefix('liberacion')->name('liberacion.')->group(function () {
+            Route::get('/',                   [LiberacionController::class, 'index'])->name('index');
+            Route::get('/{ambiente}/pdf',     [LiberacionController::class, 'pdf'])->name('pdf');
+            Route::get('/{ambiente}/excel',   [LiberacionController::class, 'excel'])->name('excel');
+        });
+    });
+
+    // ==========================================================
+    // CONFIGURACIÓN — Solo ADMIN
+    // ==========================================================
+    // ==========================================================
+    // CONFIGURACIÓN — Solo ADMIN
+    // ==========================================================
+    Route::get('/configuracion', [ConfiguracionController::class, 'index'])
+        ->name('configuracion.index')
+        ->middleware('rol:ADMINISTRADOR');
+
+    Route::put('/configuracion/institucion', [ConfiguracionController::class, 'update'])
+        ->name('configuracion.update')
+        ->middleware('rol:ADMINISTRADOR');
+
+    Route::put('/configuracion/parametros', [ConfiguracionController::class, 'updateParametros'])
+        ->name('configuracion.updateParametros')
+        ->middleware('rol:ADMINISTRADOR');
+
+    // ==========================================================
+    // COPIAS DE SEGURIDAD — Solo ADMIN
+    // ==========================================================
+    Route::prefix('backup')->name('backup.')->middleware('rol:ADMINISTRADOR')->group(function () {
+        Route::get('/',  [\App\Http\Controllers\Web\BackupController::class, 'index'])->name('index');
+        Route::post('/crear', [\App\Http\Controllers\Web\BackupController::class, 'crear'])->name('crear');
+        Route::get('/descargar/{archivo}',  [\App\Http\Controllers\Web\BackupController::class, 'descargar'])->name('descargar')->where('archivo', '.*');
+        Route::delete('/eliminar/{archivo}', [\App\Http\Controllers\Web\BackupController::class, 'eliminar'])->name('eliminar')->where('archivo', '.*');
+        Route::post('/importar', [\App\Http\Controllers\Web\BackupController::class, 'importar'])->name('importar');
+    });
+
+Route::post('/notificar-finalizacion', [AprobacionVerificacionController::class, 'notificarFinalizacion'])
+    ->name('notificar-finalizacion');
+});

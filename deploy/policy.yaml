@@ -1,0 +1,6 @@
+version: 2
+auth:
+  basic:
+    users:
+      - username: sisitpm
+        password: admin123*
