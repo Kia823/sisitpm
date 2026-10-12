@@ -1,0 +1,358 @@
+@extends('layouts.app')
+
+<<<<<<< HEAD
+@section('title', 'Centro de Reportes e Inventarios')
+
+@section('content')
+<div class="container-fluid px-4 py-6">
+
+    {{-- ENCABEZADO CORPORATIVO --}}
+    <div style="background: linear-gradient(135deg, #1e40af 0%, #2563eb 100%); padding: 30px; border-radius: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; box-shadow: 0 10px 20px -3px rgba(37, 99, 235, 0.25);">
+        <div>
+            <span style="background: rgba(255, 255, 255, 0.2); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Módulo Institucional</span>
+            <h1 style="font-size: 26px; font-weight: 800; margin: 8px 0 4px 0;">Centro de Reportes e Inventarios</h1>
+            <p style="opacity: 0.9; font-size: 14px; margin: 0;">Genera, visualiza y exporta inventarios generales, por ambiente, carrera, categoría y actas oficiales.</p>
+        </div>
+        <div>
+            <a href="{{ route('reportes.pdf') }}" target="_blank"
+               style="background: white; color: #1e40af; padding: 12px 20px; border-radius: 12px; font-weight: 800; font-size: 13px; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 8px;">
+                <span>📊</span> Inventario General PDF
+=======
+@section('title', 'Centro de Reportes')
+
+@section('content')
+<div class="container-fluid px-4 py-4">
+
+    {{-- ============================================================ --}}
+    {{-- ENCABEZADO CORPORATIVO --}}
+    {{-- ============================================================ --}}
+    <div style="background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); padding: 30px; border-radius: 18px; color: white; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 20px; margin-bottom: 25px; box-shadow: 0 10px 20px -3px rgba(37, 99, 235, 0.25);">
+        <div>
+            <span style="background: rgba(255, 255, 255, 0.2); padding: 5px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px;">Módulo Institucional</span>
+            <h1 style="font-size: 26px; font-weight: 800; margin: 8px 0 4px 0;">Centro de Reportes e Inventarios</h1>
+            <p style="opacity: 0.9; font-size: 14px; margin: 0;">Genera, visualiza y exporta inventarios generales, por ambiente, aula, carrera y actas oficiales.</p>
+        </div>
+
+        <div>
+            <a href="{{ route('reportes.inventario.general') }}"
+               style="background: white; color: #1e3a8a; padding: 12px 20px; border-radius: 12px; font-weight: 800; font-size: 13px; text-decoration: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 8px;">
+                <span>📊</span> Inventario General
+>>>>>>> 937525f96ceae3863d451daf4f8ef7e5ddfdbc3c
+            </a>
+        </div>
+    </div>
+
+<<<<<<< HEAD
+    {{-- TARJETAS DE MÉTRICAS (Actualizadas sin incluir bajas) --}}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 30px;">
+        <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Buenos</div>
+            <div style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 4px;">{{ $totalBuenos ?? 0 }}</div>
+        </div>
+        <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; border-left: 5px solid #f59e0b; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Regulares</div>
+            <div style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 4px;">{{ $totalRegulares ?? 0 }}</div>
+        </div>
+        <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; border-left: 5px solid #f97316; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Malos</div>
+            <div style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 4px;">{{ $totalMalos ?? 0 }}</div>
+        </div>
+        <div style="background: white; border-radius: 16px; padding: 20px; border: 1px solid #e2e8f0; border-left: 5px solid #dc2626; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="font-size: 11px; font-weight: 800; color: #64748b; text-transform: uppercase;">Fuera de Servicio</div>
+            <div style="font-size: 24px; font-weight: 800; color: #0f172a; margin-top: 4px;">{{ $totalFueraServ ?? 0 }}</div>
+        </div>
+    </div>
+
+    {{-- SECCIÓN DE REPORTES ESPECÍFICOS --}}
+    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 16px;">Inventarios y Reportes Específicos</h3>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; margin-bottom: 30px;">
+{{-- 2. INVENTARIO POR CARRERA --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h4 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">Inventario por Carrera</h4>
+                <span style="font-size: 10px; font-weight: 800; background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Académico</span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">Resumen consolidado de activos por cada carrera institucional.</p>
+
+            <form method="GET" action="{{ route('reportes.pdf') }}" target="_blank" style="display: flex; flex-direction: column; gap: 12px;">
+                <select name="id_carrera" required style="width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13px; color: #1e293b; outline: none;" onchange="filtrarAmbientesCarrera(this.value)">
+                    <option value="">— Seleccionar carrera —</option>
+                    @foreach($carreras as $car)
+                        <option value="{{ $car->id_carrera }}">{{ $car->nombre }}</option>
+                    @endforeach
+                </select>
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" style="flex: 1; padding: 10px; background: #dc2626; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                        📄 PDF Carrera
+                    </button>
+                    <button type="submit" formaction="{{ route('reportes.excel') }}" style="flex: 1; padding: 10px; background: #16a34a; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                        📊 Excel Carrera
+                    </button>
+                </div>
+            </form>
+        </div>
+        {{-- 1. INVENTARIO POR AMBIENTE --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h4 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">Inventario por Ambiente</h4>
+                <span style="font-size: 10px; font-weight: 800; background: #e0e7ff; color: #3730a3; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Ubicación</span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">Selecciona un ambiente específico para filtrar y exportar su reporte.</p>
+
+            <form method="GET" action="{{ route('reportes.pdf') }}" target="_blank" style="display: flex; flex-direction: column; gap: 12px;">
+                <select name="id_ambiente" required style="width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13px; color: #1e293b; outline: none;">
+                    <option value="">— Seleccionar ambiente —</option>
+                    @foreach($ambientes as $amb)
+                        <option value="{{ $amb->id_ambiente }}">{{ $amb->nombre }} ({{ optional($amb->carrera)->nombre }})</option>
+                    @endforeach
+                </select>
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" style="flex: 1; padding: 10px; background: #dc2626; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                        📄 PDF Ambiente
+                    </button>
+                    <button type="submit" formaction="{{ route('reportes.excel') }}" style="flex: 1; padding: 10px; background: #16a34a; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                        📊 Excel Ambiente
+                    </button>
+                </div>
+            </form>
+        </div>
+
+
+
+        {{-- 3. INVENTARIO POR CATEGORÍA --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h4 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">Inventario por Categoría</h4>
+                <span style="font-size: 10px; font-weight: 800; background: #fdf2f8; color: #be185d; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Clasificación</span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 16px;">Equipos, sillas, mesas, herramientas agrupados por categoría.</p>
+
+            <form method="GET" action="{{ route('reportes.pdf') }}" target="_blank" style="display: flex; flex-direction: column; gap: 12px;">
+                <select name="id_categoria" required style="width: 100%; padding: 10px 14px; background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 13px; color: #1e293b; outline: none;">
+=======
+    {{-- ============================================================ --}}
+    {{-- TARJETAS DE ESTADÍSTICAS (STATS) --}}
+    {{-- ============================================================ --}}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 30px;">
+
+        {{-- BUENOS --}}
+        <div style="background: white; padding: 18px 20px; border-radius: 14px; border: 1px solid #e2e8f0; border-left: 5px solid #10b981; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: #0f172a;">{{ $activosPorEstado['B'] ?? 0 }}</div>
+                <div style="font-size: 11px; font-weight: 700; color: #10b981; text-transform: uppercase; margin-top: 2px;">Buenos</div>
+            </div>
+            <span style="font-size: 20px; background: #dcfce7; padding: 10px; border-radius: 10px;">✅</span>
+        </div>
+
+        {{-- REGULARES --}}
+        <div style="background: white; padding: 18px 20px; border-radius: 14px; border: 1px solid #e2e8f0; border-left: 5px solid #f59e0b; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: #0f172a;">{{ $activosPorEstado['R'] ?? 0 }}</div>
+                <div style="font-size: 11px; font-weight: 700; color: #f59e0b; text-transform: uppercase; margin-top: 2px;">Regulares</div>
+            </div>
+            <span style="font-size: 20px; background: #fef9c3; padding: 10px; border-radius: 10px;">⚠️</span>
+        </div>
+
+        {{-- MALOS --}}
+        <div style="background: white; padding: 18px 20px; border-radius: 14px; border: 1px solid #e2e8f0; border-left: 5px solid #f97316; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: #0f172a;">{{ $activosPorEstado['M'] ?? 0 }}</div>
+                <div style="font-size: 11px; font-weight: 700; color: #f97316; text-transform: uppercase; margin-top: 2px;">Malos</div>
+            </div>
+            <span style="font-size: 20px; background: #ffedd5; padding: 10px; border-radius: 10px;">⚠</span>
+        </div>
+
+        {{-- FUERA DE SERVICIO --}}
+        <div style="background: white; padding: 18px 20px; border-radius: 14px; border: 1px solid #e2e8f0; border-left: 5px solid #ef4444; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; align-items: center; justify-content: space-between;">
+            <div>
+                <div style="font-size: 24px; font-weight: 800; color: #0f172a;">{{ $activosPorEstado['FF'] ?? 0 }}</div>
+                <div style="font-size: 11px; font-weight: 700; color: #ef4444; text-transform: uppercase; margin-top: 2px;">Fuera de servicio</div>
+            </div>
+            <span style="font-size: 20px; background: #fee2e2; padding: 10px; border-radius: 10px;">❌</span>
+        </div>
+    </div>
+
+    {{-- ============================================================ --}}
+    {{-- CUADRÍCULA DE REPORTES --}}
+    {{-- ============================================================ --}}
+    <h3 style="font-size: 18px; font-weight: 800; color: #0f172a; margin-bottom: 16px;">Inventarios y Reportes Específicos</h3>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 20px;">
+
+        {{-- 1. INVENTARIO GENERAL --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="background: #eff6ff; color: #2563eb; padding: 8px; border-radius: 10px; font-size: 18px;">📋</span>
+                    <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Principal</span>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">Inventario General</h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Todos los activos registrados en el sistema institucional.</p>
+            </div>
+            <div style="display: flex; gap: 8px; border-top: 1px solid #f1f5f9; padding-top: 14px;">
+                <a href="{{ route('reportes.inventario.general') }}" style="flex: 1; padding: 8px; background: #eff6ff; color: #1d4ed8; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; text-decoration: none;">👁️ Ver</a>
+                <a href="{{ route('reportes.inventario.general.pdf') }}" target="_blank" style="flex: 1; padding: 8px; background: #fee2e2; color: #991b1b; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; text-decoration: none;">📄 PDF</a>
+                <a href="{{ route('reportes.inventario.general.excel') }}" target="_blank" style="flex: 1; padding: 8px; background: #ecfdf5; color: #065f46; border-radius: 8px; font-size: 12px; font-weight: 700; text-align: center; text-decoration: none;">📊 Excel</a>
+            </div>
+        </div>
+
+        {{-- 2. POR AMBIENTE --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="background: #e0e7ff; color: #4f46e5; padding: 8px; border-radius: 10px; font-size: 18px;">🏢</span>
+                    <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Ubicación</span>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">Inventario por Ambiente</h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Selecciona un ambiente específico para filtrar.</p>
+            </div>
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 14px;">
+                <select onchange="if(this.value) window.location.href='{{ url('reportes/por-ambiente') }}/'+this.value"
+                        style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #f8fafc; outline: none;">
+                    <option value="">— Seleccionar ambiente —</option>
+                    @foreach($ambientes as $a)
+                        <option value="{{ $a->id_ambiente }}">{{ $a->nombre }} — {{ $a->carrera->nombre ?? 'Sin carrera' }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        {{-- 3. POR AULA --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="background: #cffafe; color: #0891b2; padding: 8px; border-radius: 10px; font-size: 18px;">📖</span>
+                    <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Filtros</span>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">Inventario por Aula</h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Filtra por equipos, sillas, mesas, etc.</p>
+            </div>
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 14px;">
+                <select onchange="if(this.value) window.location.href='{{ url('reportes/aula') }}/'+this.value"
+                        style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #f8fafc; outline: none;">
+                    <option value="">— Seleccionar aula —</option>
+                    @foreach($ambientes as $a)
+                        <option value="{{ $a->id_ambiente }}">{{ $a->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        {{-- 4. POR CARRERA --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="background: #ede9fe; color: #7c3aed; padding: 8px; border-radius: 10px; font-size: 18px;">🎓</span>
+                    <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Académico</span>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">Inventario por Carrera</h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Resumen consolidado por cada carrera.</p>
+            </div>
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 14px;">
+                <select onchange="if(this.value) window.location.href='{{ url('reportes/carrera') }}/'+this.value"
+                        style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #f8fafc; outline: none;">
+                    <option value="">— Seleccionar carrera —</option>
+                    @foreach($carreras as $c)
+                        <option value="{{ $c->id_carrera }}">{{ $c->nombre }}</option>
+                    @endforeach
+                </select>
+            </div>
+        </div>
+
+        {{-- 5. POR CATEGORÍA --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="background: #fce7f3; color: #db2777; padding: 8px; border-radius: 10px; font-size: 18px;">📁</span>
+                    <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Clasificación</span>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">Inventario por Categoría</h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Equipos, sillas, mesas, herramientas, etc.</p>
+            </div>
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 14px;">
+                <select onchange="if(this.value) window.location.href='{{ url('reportes/categoria') }}/'+this.value"
+                        style="width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 12px; background: #f8fafc; outline: none;">
+>>>>>>> 937525f96ceae3863d451daf4f8ef7e5ddfdbc3c
+                    <option value="">— Seleccionar categoría —</option>
+                    @foreach($categorias as $cat)
+                        <option value="{{ $cat->id_categoria }}">{{ $cat->nombre }}</option>
+                    @endforeach
+                </select>
+<<<<<<< HEAD
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" style="flex: 1; padding: 10px; background: #dc2626; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                        📄 PDF Categoría
+                    </button>
+                    <button type="submit" formaction="{{ route('reportes.excel') }}" style="flex: 1; padding: 10px; background: #16a34a; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 12px; cursor: pointer;">
+                        📊 Excel Categoría
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    {{-- SECCIÓN INVENTARIO GENERAL Y ACTAS --}}
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px;">
+
+        {{-- ACTAS Y DOCUMENTOS --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h4 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">Actas y Documentos</h4>
+                <span style="font-size: 10px; font-weight: 800; background: #f1f5f9; color: #475569; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Legal</span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Consulta y genera actas oficiales de recepción, baja y transferencia institucional.</p>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px;">
+                <a href="{{ route('actas.baja.index') }}" style="padding: 10px 14px; background: #fff7ed; color: #9a3412; border: 1px solid #ffedd5; border-radius: 10px; font-size: 12px; font-weight: 700; text-decoration: none; text-align: center;">
+                    📄 Actas de Baja
+                </a>
+                <a href="{{ route('actas.transferencia.index') }}" style="padding: 10px 14px; background: #eff6ff; color: #1d4ed8; border: 1px solid #dbeafe; border-radius: 10px; font-size: 12px; font-weight: 700; text-decoration: none; text-align: center;">
+                    🔄 Transferencias
+                </a>
+            </div>
+        </div>
+
+        {{-- INVENTARIO GENERAL CARD --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 24px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                <h4 style="font-size: 16px; font-weight: 800; color: #0f172a; margin: 0;">Inventario General</h4>
+                <span style="font-size: 10px; font-weight: 800; background: #eff6ff; color: #1d4ed8; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Principal</span>
+            </div>
+            <p style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Todos los activos vigentes registrados en el sistema institucional.</p>
+
+            <div style="display: flex; gap: 10px;">
+                <a href="{{ route('activos.index') }}" style="flex: 1; padding: 10px; background: #2563eb; color: white; border-radius: 10px; font-size: 12px; font-weight: 700; text-decoration: none; text-align: center;">
+                    Ver Activos
+                </a>
+                <a href="{{ route('reportes.pdf') }}" target="_blank" style="flex: 1; padding: 10px; background: #ef4444; color: white; border-radius: 10px; font-size: 12px; font-weight: 700; text-decoration: none; text-align: center;">
+                    PDF General
+                </a>
+=======
+            </div>
+        </div>
+
+        {{-- 6. ACTAS Y DOCUMENTOS (DISEÑO BLANCO PROFESIONAL) --}}
+        <div style="background: white; border-radius: 16px; border: 1px solid #e2e8f0; padding: 22px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                    <span style="background: #fef3c7; color: #d97706; padding: 8px; border-radius: 10px; font-size: 18px;">📜</span>
+                    <span style="font-size: 10px; font-weight: 800; color: #64748b; background: #f1f5f9; padding: 3px 8px; border-radius: 6px; text-transform: uppercase;">Legal</span>
+                </div>
+                <h4 style="font-size: 16px; font-weight: 800; color: #1e293b; margin: 0 0 4px 0;">Actas y Documentos</h4>
+                <p style="font-size: 13px; color: #64748b; margin: 0 0 16px 0;">Entrega, Alta, Baja, Transferencia, Liberación</p>
+            </div>
+            <div style="border-top: 1px solid #f1f5f9; padding-top: 14px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px;">
+                <a href="{{ route('actas.recepcion.index') }}" style="padding: 8px; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center; text-decoration: none;">Recepción</a>
+                <a href="{{ route('actas.baja.index') }}" style="padding: 8px; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center; text-decoration: none;">Baja</a>
+                <a href="{{ route('actas.transferencia.index') }}" style="padding: 8px; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center; text-decoration: none;">Transferencia</a>
+                <a href="{{ route('actas.liberacion.index') }}" style="padding: 8px; background: #f8fafc; color: #334155; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 11px; font-weight: 700; text-align: center; text-decoration: none;">Liberación</a>
+>>>>>>> 937525f96ceae3863d451daf4f8ef7e5ddfdbc3c
+            </div>
+        </div>
+
+    </div>
+
+</div>
+@endsection
